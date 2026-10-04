@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090a12" />
+  <meta name="description" content="A shared workspace for team tasks, work submissions, and ideas." />
+  <title>FS Panic — Team Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="wordmark" href="#home" aria-label="FS Panic workspace home"><span class="wordmark-icon">FS</span><span>FS <b>PANIC</b></span></a>
+      <div class="header-status"><span class="status-dot"></span><span>TEAM WORKSPACE</span><span class="status-divider">/</span><span>COHORT ’26</span></div>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span></button>
+      <nav class="site-nav" id="siteNav" aria-label="Main navigation">
+        <a href="#team">Team</a><a href="#attendance">Attendance</a><a href="#tasks">Tasks</a><a href="#submissions">Submissions</a><a href="#suggestions">Suggestions</a>
+        <button class="admin-login-trigger" id="adminLoginOpen" type="button">Admin login <span>↗</span></button>
+        <button class="admin-login-trigger" id="adminLogout" type="button" hidden>Sign out</button>
+      </nav>
+    </header>
+
+    <main id="home">
+      <div class="announcement"><span class="announcement-light"></span><span class="bolt">ϟ</span><span>ONE TEAM — IDEAS INTO REALITY</span><a href="#suggestions">Share an idea <span>→</span></a></div>
+
+      <section class="welcome panel" aria-labelledby="welcomeTitle">
+        <div class="welcome-copy"><div class="eyebrow"><span class="bracket">[</span> YOUR TEAM, IN SYNC <span class="bracket">]</span></div><p class="hero-kicker">Plan together. Build together. Ship together.</p>
+          <h1 id="welcomeTitle">Make room<br />for <span>great work.</span></h1>
+          <p class="welcome-description">A shared home for assigning tasks, handing in work, and making the next good idea happen.</p>
+          <a class="button button-primary" href="#tasks">Open the workspace <span class="button-arrow">⟶</span></a>
+        </div>
+        <div class="welcome-art" aria-hidden="true"><div class="art-orbit orbit-a"></div><div class="art-orbit orbit-b"></div><div class="art-card"><span class="art-card-label">SPRINT STATUS</span><strong><span class="status-dot"></span> In motion</strong><div class="art-progress"><i></i></div><div class="art-card-foot"><span>TEAM PROGRESS</span><b>76%</b></div></div><span class="art-spark spark-one">✳</span><span class="art-spark spark-two">✦</span></div>
+      </section>
+
+      <section class="stats-grid" aria-label="Workspace overview">
+        <article class="stat-card"><span class="stat-label">TEAM MEMBERS</span><strong id="memberCount">0</strong><span class="stat-note">On your crew</span><span class="stat-mark">⌘</span></article>
+        <article class="stat-card"><span class="stat-label">OPEN TASKS</span><strong id="taskCount">0</strong><span class="stat-note">Ready for progress</span><span class="stat-mark">↗</span></article>
+        <article class="stat-card"><span class="stat-label">WORK SUBMITTED</span><strong id="submissionCount">0</strong><span class="stat-note">Ideas in review</span><span class="stat-mark">✳</span></article>
+        <article class="stat-card"><span class="stat-label">TEAM IDEAS</span><strong id="suggestionCount">0</strong><span class="stat-note">Keep them coming</span><span class="stat-mark">ϟ</span></article>
+      </section>
+
+      <section class="workspace-section" id="team">
+        <div class="section-heading"><div><span class="section-kicker">01 / YOUR PEOPLE</span><h2>Team directory</h2><p>Pick a teammate to prefill a task or submission.</p></div><span class="section-icon">⌘</span></div>
+        <div class="team-layout">
+          <div class="team-list-wrap"><div class="subsection-heading"><h3>Quick select</h3><span class="micro-label">TEAM EMAIL BAR</span></div><div id="teamList" class="team-list" aria-live="polite"></div></div>
+          <form class="form-card compact-form" id="memberForm">
+            <div class="subsection-heading"><h3>Add a teammate</h3><span class="micro-label admin-only">ADMIN</span></div>
+            <div class="form-grid"><label>Name<input id="memberName" name="name" placeholder="e.g. Sam Rivera" required maxlength="60" /></label><label>Email<input id="memberEmail" name="email" type="email" placeholder="sam@example.com" required maxlength="120" /></label><label class="full-width">Role or department<input id="memberRole" name="role" placeholder="e.g. Product designer" maxlength="80" /></label></div>
+            <button class="button button-small button-secondary" type="submit">Save teammate <span>＋</span></button>
+          </form>
+        </div>
+      </section>
+
+      <section class="workspace-section" id="attendance">
+        <div class="section-heading"><div><span class="section-kicker">02 / CHECK IN</span><h2>Team attendance</h2><p>Record today’s attendance and follow up on three consecutive absences.</p></div><span class="section-icon">✓</span></div>
+        <div class="two-column attendance-layout">
+          <form class="form-card" id="attendanceForm">
+            <div class="subsection-heading"><h3>Daily check-in</h3><span class="micro-label admin-only">ADMIN</span></div>
+            <label>Attendance date<input id="attendanceDate" type="date" required /></label>
+            <div id="attendanceList" class="attendance-list" aria-live="polite"></div>
+            <button class="button button-primary button-small admin-only" type="submit">Save attendance <span class="button-arrow">⟶</span></button>
+            <p class="form-hint">Three consecutive recorded absent days will show a warning email action.</p>
+          </form>
+          <div class="form-card"><div class="subsection-heading"><h3>Attendance overview</h3><span class="micro-label" id="attendanceSummary">0 MEMBERS</span></div><div id="attendanceWarnings" class="attendance-warnings" aria-live="polite"></div></div>
+        </div>
+        <div class="form-card attendance-history admin-only">
+          <div class="subsection-heading"><h3>Daily attendance history</h3><span class="micro-label" id="attendanceHistoryCount">0 DAYS</span></div>
+          <div id="attendanceHistory" class="attendance-history-list" aria-live="polite"></div>
+          <p class="form-hint">Saved attendance stays in this browser so admins can review it later.</p>
+        </div>
+      </section>
+
+      <section class="workspace-section" id="tasks">
+        <div class="section-heading"><div><span class="section-kicker">02 / MAKE IT HAPPEN</span><h2>Tasks &amp; assignments</h2><p>Give good work a clear owner, brief, and deadline.</p></div><span class="section-icon">↗</span></div>
+        <div class="two-column">
+          <form class="form-card" id="taskForm">
+            <div class="subsection-heading"><h3>Assign a task</h3><span class="micro-label admin-only">ADMIN</span></div>
+            <div class="form-grid"><label class="full-width">Send to<select id="taskAssignee" required></select></label><label>Task title<input id="taskTitle" required maxlength="100" placeholder="Design homepage banner" /></label><label>Category<select id="taskCategory"><option>Graphics / Photo</option><option>Text Content</option><option>Coding</option></select></label><label>Due date<input id="taskDue" type="date" /></label><label>Priority<select id="taskPriority"><option>Medium</option><option>Low</option><option>High</option></select></label><label class="full-width">Instructions<textarea id="taskDescription" rows="4" maxlength="1500" placeholder="What needs to be done? Add requirements and references."></textarea></label></div>
+            <button class="button button-primary button-small" type="submit">Assign task <span class="button-arrow">⟶</span></button><p class="form-hint">Assignments are saved here. Email opens as a pre-filled draft in your mail app.</p>
+          </form>
+          <div class="form-card task-board"><div class="subsection-heading"><h3>Task board</h3><span class="micro-label" id="taskBoardLabel">ALL TASKS</span></div><div id="taskList" class="task-list" aria-live="polite"></div></div>
+        </div>
+      </section>
+
+      <section class="workspace-section" id="submissions">
+        <div class="section-heading"><div><span class="section-kicker">03 / SHOW YOUR WORK</span><h2>Work submissions</h2><p>Share visuals, writing, or code with the team.</p></div><span class="section-icon">✳</span></div>
+        <div class="two-column submission-layout">
+          <form class="form-card" id="submissionForm">
+            <div class="subsection-heading"><h3>Submit work</h3><span class="micro-label">NEW SUBMISSION</span></div>
+            <div class="form-grid"><label class="full-width">Submitted by<select id="submissionAuthor" required></select></label><label class="full-width">Related task<select id="submissionTask"><option value="">No task selected</option></select></label><label class="full-width">Work type<select id="submissionType"><option value="text">Text content</option><option value="image">Graphics / photo</option><option value="code">Coding (HTML / CSS / JS)</option></select></label></div>
+            <div id="textFields" class="submission-fields"><label>Your text<textarea id="submissionText" rows="6" maxlength="10000" placeholder="Write or paste your copy, notes, or documentation…"></textarea></label><div class="field-foot"><span id="textCount">0 words · 0 characters</span></div></div>
+            <div id="imageFields" class="submission-fields hidden"><label>Image file<input id="submissionImage" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" /></label><label>Or paste an image URL<input id="submissionImageUrl" type="url" placeholder="https://example.com/image.png" /></label><p class="form-hint">Files are previewed in this browser and are not uploaded to cloud storage.</p></div>
+            <div id="codeFields" class="submission-fields hidden"><label>HTML<textarea id="codeHtml" class="code-input" rows="4" placeholder="<h1>Hello, team!</h1>"></textarea></label><label>CSS<textarea id="codeCss" class="code-input" rows="4" placeholder="body { font-family: sans-serif; }"></textarea></label><label>JavaScript<textarea id="codeJs" class="code-input" rows="4" placeholder="// Add interactions here"></textarea></label><div class="preview-heading"><span>LIVE PREVIEW</span><span class="preview-dot"></span></div><iframe id="codePreview" title="Live preview of submitted code" sandbox="allow-scripts" srcdoc=""></iframe><p class="form-hint">Preview scripts run in a sandbox and cannot access the parent page.</p></div>
+            <label class="submission-note">Short note <textarea id="submissionNote" rows="2" maxlength="300" placeholder="Anything the reviewer should know?"></textarea></label>
+            <button class="button button-primary button-small" type="submit">Submit work <span class="button-arrow">⟶</span></button>
+          </form>
+          <div class="form-card submissions-board"><div class="subsection-heading"><h3>Submitted work</h3><span class="micro-label" id="feedCount">0 ITEMS</span></div><div id="submissionFeed" class="submission-feed" aria-live="polite"></div></div>
+        </div>
+      </section>
+
+      <section class="workspace-section" id="suggestions">
+        <div class="section-heading"><div><span class="section-kicker">04 / BETTER TOGETHER</span><h2>Suggestion box</h2><p>Good ideas can come from anywhere. Share yours.</p></div><span class="section-icon">ϟ</span></div>
+        <div class="two-column suggestion-layout">
+          <form class="form-card" id="suggestionForm"><div class="subsection-heading"><h3>Post an idea</h3><span class="micro-label">OPEN TO EVERYONE</span></div><label>Your name<select id="suggestionAuthor" required></select></label><label class="spaced-label">Your suggestion<textarea id="suggestionText" rows="5" maxlength="1200" required placeholder="What could make the team or product better?"></textarea></label><button class="button button-primary button-small" type="submit">Post suggestion <span class="button-arrow">⟶</span></button></form>
+          <div class="form-card suggestions-board"><div class="subsection-heading"><h3>Team ideas</h3><span class="micro-label">SHARED BOARD</span></div><div id="suggestionList" class="suggestion-list" aria-live="polite"></div></div>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer"><a class="footer-mark" href="#home">FS<span>.</span></a><span>Make something useful. Then make it real.</span><a href="mailto:hello@fspanic.dev">Say hello <span>↗</span></a></footer>
+  </div>
+  <dialog class="login-dialog" id="adminLoginDialog" aria-labelledby="loginTitle">
+    <form class="form-card login-card" id="adminLoginForm">
+      <div class="subsection-heading"><div><span class="section-kicker">ADMIN ACCESS</span><h2 id="loginTitle">Welcome back</h2></div><button class="dialog-close" id="adminLoginClose" type="button" aria-label="Close login">×</button></div>
+      <p class="login-copy">Sign in to manage teammates, assign tasks, and moderate suggestions.</p>
+      <label>Email<input id="adminEmail" type="email" autocomplete="username" value="axel348347@gmail.com" required /></label>
+      <label>Password<input id="adminPassword" type="password" autocomplete="current-password" required /></label>
+      <button class="button button-primary button-small" type="submit">Sign in <span class="button-arrow">⟶</span></button>
+      <p class="form-hint">Demo login only. For real security, use server-side authentication.</p>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>
