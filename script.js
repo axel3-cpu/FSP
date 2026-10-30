@@ -2,10 +2,6 @@ const siteHeader = document.querySelector('.site-header');
 
 function updateHeaderOnScroll() {
   if (siteHeader) siteHeader.classList.toggle('is-scrolled', window.scrollY > 40);
-
-  const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
-  const scrollProgress = scrollableHeight > 0 ? (window.scrollY / scrollableHeight) * 100 : 0;
-  document.documentElement.style.setProperty('--scroll-progress', `${scrollProgress}%`);
 }
 
 updateHeaderOnScroll();
@@ -14,10 +10,63 @@ window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
 const menuToggle = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.navigation');
 
+// Compact mobile shortcuts for the site's main destinations.
+const bottomNav = document.createElement('nav');
+bottomNav.className = 'site-bottom-nav';
+bottomNav.setAttribute('aria-label', 'Quick navigation');
+bottomNav.innerHTML = `
+  <a class="bottom-nav-link" href="index.html#home" data-bottom-nav="home" aria-label="Home">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 10 8.5-7 8.5 7v10a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"></path><path d="M9 21v-7h6v7"></path></svg><span>Home</span>
+  </a>
+  <a class="bottom-nav-link" href="design.html" data-bottom-nav="design" aria-label="Website design">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"></path><path d="m14 6 4 4"></path></svg><span>Design</span>
+  </a>
+  <a class="bottom-nav-link" href="team.html" data-bottom-nav="team" aria-label="Team">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="10" cy="7" r="4"></circle><path d="M20 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg><span>Team</span>
+  </a>
+  <a class="bottom-nav-link" href="webcore.html" data-bottom-nav="webcore" aria-label="WebCore member information">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"></path></svg><span>WebCore</span>
+  </a>
+  <a class="bottom-nav-link" href="index.html#project-enquiry" data-bottom-nav="form" aria-label="Project form">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M8 13h8M8 17h8"></path></svg><span>Form</span>
+  </a>
+  <a class="bottom-nav-link" href="join.html#team-join-form" data-bottom-nav="join" aria-label="Join FS Panic">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="4"></circle><path d="M3 21v-2a6 6 0 0 1 12 0v2M19 8v6M16 11h6"></path></svg><span>Join</span>
+  </a>`;
+document.body.append(bottomNav);
+
+const bottomNavPage = window.location.pathname.split('/').pop() || 'index.html';
+const bottomNavHash = window.location.hash;
+const teamPages = ['team.html', 'president.html', 'vice-president.html', 'designer.html', 'tester.html', 'graphics-designer.html'];
+const activeBottomNav = bottomNavPage === 'design.html' ? 'design'
+  : bottomNavPage === 'webcore.html' ? 'webcore'
+  : teamPages.includes(bottomNavPage) ? 'team'
+  : bottomNavHash === '#project-enquiry' ? 'form'
+  : (bottomNavPage === 'join.html' || bottomNavHash === '#team-join-form') ? 'join'
+  : (bottomNavPage === 'index.html' && (!bottomNavHash || bottomNavHash === '#home')) ? 'home' : '';
+if (activeBottomNav) {
+  const activeLink = bottomNav.querySelector(`[data-bottom-nav="${activeBottomNav}"]`);
+  activeLink?.classList.add('is-active');
+  activeLink?.setAttribute('aria-current', 'page');
+}
+
+bottomNav.addEventListener('click', (event) => {
+  const selectedLink = event.target.closest('.bottom-nav-link');
+  if (!selectedLink) return;
+
+  bottomNav.querySelectorAll('.bottom-nav-link').forEach((link) => {
+    const isSelected = link === selectedLink;
+    link.classList.toggle('is-active', isSelected);
+    if (isSelected) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+});
+
 // Site-wide search covers pages, sections, and interactive tools.
 const searchItems = [
   { title: 'Home', detail: 'FS Panic builder collective and launchpad', href: 'index.html#home', keywords: 'homepage collective builder launchpad' },
   { title: 'Builder pathways', detail: 'Choose an idea, working build, or builder pathway', href: 'index.html#panic-pathways', keywords: 'pathway idea mvp build builder tabs selector' },
+  { title: 'Join the team', detail: 'Apply to contribute your skills to FS Panic projects', href: 'join.html#team-join-form', keywords: 'join team application skills developer designer collaborator' },
   { title: 'Venture showcase & filters', detail: 'Explore example AI, commerce, hardware, and DevTools builds', href: 'index.html#panic-showcase', keywords: 'ventures filter ai commerce hardware devtools showcase categories' },
   { title: 'PanicHack buildathon', detail: 'See the 36-hour buildathon concept and register interest', href: 'index.html#buildathon', keywords: 'event hackathon buildathon panic hack register' },
   { title: 'Quick project pitch', detail: 'Add a one-line idea to the project enquiry form', href: 'index.html#quick-pitch', keywords: 'pitch idea quick form submit project' },
@@ -28,10 +77,11 @@ const searchItems = [
   { title: 'Project enquiry form', detail: 'Share project details and contact information', href: 'index.html#project-enquiry', keywords: 'contact form enquiry pitch email project' },
   { title: 'Color themes', detail: 'Switch between Violet, Ocean, Rose, and Light themes', href: 'index.html#theme-heading', keywords: 'theme color appearance violet ocean rose light' },
   { title: 'About the team', detail: 'Learn about CORE FS PANIC and its approach', href: 'index.html#about', keywords: 'about company team approach' },
-  { title: 'Meet the team', detail: 'Profiles for Axel, President, Designer, Tester, and Graphics Designer', href: 'index.html#team', keywords: 'people profiles president vice designer tester graphics' },
+  { title: 'Meet the team', detail: 'Meet Axel, Vice President, Designer, Tester, and Graphics Designer', href: 'team.html', keywords: 'people profiles president vice designer tester graphics' },
   { title: 'Services', detail: 'Strategy, website design, and web development', href: 'services.html', keywords: 'services offering' },
   { title: 'Strategy & direction', detail: 'Project discovery, planning, and website strategy', href: 'strategy.html', keywords: 'strategy discover planning direction' },
   { title: 'Website design', detail: 'Design service and 420-concept template gallery', href: 'design.html', keywords: 'design gallery templates concepts preview filters' },
+  { title: 'WebCore member access', detail: 'Open the separate WebCore members page', href: 'webcore.html', keywords: 'webcore member access second website' },
   { title: 'Web development', detail: 'Responsive website development and build process', href: 'development.html', keywords: 'development build code responsive' },
   { title: 'Work & projects', detail: 'Browse project examples and case studies', href: 'work.html', keywords: 'work portfolio projects case studies' },
   { title: 'Order a project', detail: 'Go to the project enquiry form', href: 'services.html#project-enquiry', keywords: 'order start contact quote enquiry' },
@@ -121,8 +171,30 @@ if (siteHeader) {
       event.preventDefault();
       if (searchDialog.hidden) openSiteSearch();
       else closeSiteSearch();
+      return;
     }
-    if (event.key === 'Escape' && !searchDialog.hidden) closeSiteSearch();
+
+    if (searchDialog.hidden) return;
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeSiteSearch();
+      return;
+    }
+
+    if (event.key === 'Tab') {
+      const focusable = Array.from(searchDialog.querySelectorAll('button, input, a[href]'))
+        .filter((element) => !element.disabled && element.getClientRects().length);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
   });
 }
 
@@ -134,32 +206,81 @@ if (menuToggle && navigation) {
     navigation.classList.toggle('is-open', !isOpen);
   });
 
+  function closeNavigation() {
+    menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.setAttribute('aria-label', 'Open navigation');
+    navigation.classList.remove('is-open');
+  }
+
   navigation.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      menuToggle.setAttribute('aria-expanded', 'false');
-      menuToggle.setAttribute('aria-label', 'Open navigation');
-      navigation.classList.remove('is-open');
-    });
+    link.addEventListener('click', closeNavigation);
+  });
+
+  document.addEventListener('click', (event) => {
+    if (menuToggle.getAttribute('aria-expanded') !== 'true') return;
+    if (navigation.contains(event.target) || menuToggle.contains(event.target)) return;
+    closeNavigation();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') {
+      closeNavigation();
+      menuToggle.focus();
+    }
   });
 }
 
 const year = document.getElementById('year');
 if (year) year.textContent = new Date().getFullYear();
 
-document.querySelectorAll('.site-footer').forEach((footer) => {
-  if (footer.querySelector('.footer-social-links')) return;
+// Submit Web3Forms enquiries asynchronously while keeping native POST as a no-JS fallback.
+document.querySelectorAll('form[action="https://api.web3forms.com/submit"], form#form').forEach((form) => {
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-  const socialLinks = document.createElement('div');
-  socialLinks.className = 'footer-social-links';
-  socialLinks.setAttribute('aria-label', 'Contact and social links');
-  socialLinks.innerHTML = `
-    <a href="mailto:axel348347@gmail.com" aria-label="Email Axel" title="Email Axel">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m4 7 8 6 8-6"></path></svg>
-    </a>
-    <a href="https://github.com/axel3-cpu" target="_blank" rel="noopener noreferrer" aria-label="Visit Axel’s GitHub profile" title="GitHub">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 6v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.7a5.2 5.2 0 0 0-1.4-3.6 4.8 4.8 0 0 0-.1-3.6s-1.2-.4-3.8 1.4a13 13 0 0 0-6.9 0C5.5 1.2 4.3 1.6 4.3 1.6a4.8 4.8 0 0 0-.1 3.6 5.2 5.2 0 0 0-1.4 3.6c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 0 0-.9 2.6V22"></path></svg>
-    </a>`;
-  footer.append(socialLinks);
+    const submitButton = form.querySelector('button[type="submit"], input[type="submit"]');
+    const statusMessage = form.querySelector('.form-note[role="status"], #result');
+    const originalButtonHTML = submitButton?.innerHTML;
+    const originalButtonValue = submitButton?.value;
+    const formData = new FormData(form);
+
+    if (!formData.has('access_key')) {
+      formData.append('access_key', '98e942a3-015d-4ab4-a276-906a42c91f8d');
+    }
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      if (submitButton instanceof HTMLInputElement) submitButton.value = 'Sending…';
+      else submitButton.textContent = 'Sending…';
+    }
+    if (statusMessage) statusMessage.textContent = 'Sending your message…';
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await response.json();
+
+      if (!response.ok || result.success !== true) {
+        throw new Error(result.message || 'Your message could not be sent. Please try again.');
+      }
+
+      form.reset();
+      if (statusMessage) statusMessage.textContent = 'Success! Your message has been sent.';
+      else window.alert('Success! Your message has been sent.');
+    } catch (error) {
+      const message = error.message || 'Something went wrong. Please try again.';
+      if (statusMessage) statusMessage.textContent = message;
+      else window.alert(message);
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        if (submitButton instanceof HTMLInputElement) submitButton.value = originalButtonValue;
+        else submitButton.innerHTML = originalButtonHTML;
+      }
+    }
+  });
 });
 
 const validThemes = ['violet', 'ocean', 'rose', 'light'];
@@ -216,54 +337,121 @@ try {
 }
 applyTheme(savedTheme);
 
-document.querySelectorAll('.project-form').forEach((form) => {
-  form.addEventListener('submit', async (event) => {
-    event.preventDefault();
+const customSkillList = document.getElementById('custom-skill-list');
+const addSkillButton = document.querySelector('[data-add-skill]');
+if (customSkillList && addSkillButton) {
+  addSkillButton.addEventListener('click', () => {
+    const skillNumber = customSkillList.querySelectorAll('input').length + 1;
+    const skillInput = document.createElement('input');
+    skillInput.type = 'text';
+    skillInput.name = 'otherSkills[]';
+    skillInput.id = `join-other-skills-${skillNumber}`;
+    skillInput.placeholder = 'Add another skill';
+    skillInput.setAttribute('aria-label', `Additional skill ${skillNumber}`);
+    customSkillList.append(skillInput);
+    skillInput.focus();
+  });
+}
 
-    const submitButton = form.querySelector('[type="submit"]');
-    const originalButtonContent = submitButton.innerHTML;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Sending…';
+const joinPaymentButton = document.getElementById('join-payment-button');
+const joinPaymentStatus = document.getElementById('join-payment-status');
+if (joinPaymentButton && joinPaymentStatus) {
+  const paymentConfig = window.RAZORPAY_CONFIG || {};
+  const paymentAmountPaise = 40000;
+  let razorpayScriptPromise;
+
+  function setPaymentStatus(message) {
+    joinPaymentStatus.textContent = message;
+  }
+
+  function setPaymentBusy(isBusy) {
+    joinPaymentButton.disabled = isBusy;
+    joinPaymentButton.textContent = isBusy ? 'Please wait…' : 'Pay ₹400 with Razorpay ↗';
+  }
+
+  function loadRazorpayCheckout() {
+    if (window.Razorpay) return Promise.resolve();
+    if (razorpayScriptPromise) return razorpayScriptPromise;
+
+    razorpayScriptPromise = new Promise((resolve, reject) => {
+      const checkoutScript = document.createElement('script');
+      checkoutScript.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      checkoutScript.onload = resolve;
+      checkoutScript.onerror = () => reject(new Error('Razorpay Checkout could not be loaded.'));
+      document.head.append(checkoutScript);
+    });
+    return razorpayScriptPromise;
+  }
+
+  joinPaymentButton.addEventListener('click', async () => {
+    if (!paymentConfig.keyId || !paymentConfig.createOrderUrl || !paymentConfig.verifyPaymentUrl) {
+      setPaymentStatus('Razorpay is not configured yet. Add the public key ID and secure order/verification endpoint URLs, then configure the matching backend before accepting payments.');
+      return;
+    }
+
+    setPaymentBusy(true);
+    setPaymentStatus('Creating a secure ₹400 payment order…');
 
     try {
-      const endpoint = form.action.replace('https://formsubmit.co/', 'https://formsubmit.co/ajax/');
-      const response = await fetch(endpoint, {
+      const orderResponse = await fetch(paymentConfig.createOrderUrl, {
         method: 'POST',
-        body: new FormData(form),
-        headers: { Accept: 'application/json' }
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ amount: paymentAmountPaise, currency: 'INR', purpose: 'Optional FS Panic team application payment' })
       });
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error('The enquiry could not be submitted. Please try again.');
+      const orderResult = await orderResponse.json();
+      const order = orderResult.order || orderResult;
+      if (!orderResponse.ok || !order.id || order.amount !== paymentAmountPaise || order.currency !== 'INR') {
+        throw new Error('A valid ₹400 INR Razorpay order was not returned.');
       }
 
-      const successMessage = document.createElement('div');
-      successMessage.className = 'form-success';
-      successMessage.setAttribute('role', 'status');
-      successMessage.setAttribute('aria-live', 'assertive');
-      successMessage.tabIndex = -1;
-      successMessage.innerHTML = '<span class="success-confetti" aria-hidden="true">🎉</span><p class="eyebrow">Enquiry received</p><h2>Thank you!</h2><p>Your project enquiry was sent successfully. Taking you home in a moment…</p>';
-      form.replaceChildren(successMessage);
-      successMessage.focus();
-
-      window.setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 2000);
+      await loadRazorpayCheckout();
+      const checkout = new window.Razorpay({
+        key: paymentConfig.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'FS Panic',
+        description: 'Optional separate payment',
+        order_id: order.id,
+        theme: { color: '#a58bff' },
+        handler: async (paymentResponse) => {
+          setPaymentStatus('Payment received by Razorpay. Verifying it securely…');
+          try {
+            const verificationResponse = await fetch(paymentConfig.verifyPaymentUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+              body: JSON.stringify(paymentResponse)
+            });
+            const verification = await verificationResponse.json();
+            if (!verificationResponse.ok || verification.verified !== true) {
+              throw new Error('Payment verification was not confirmed.');
+            }
+            setPaymentStatus('Payment verified successfully. Your team application is still submitted separately using the form below.');
+          } catch (error) {
+            setPaymentStatus('We could not verify this payment yet. Please contact the team with your Razorpay payment ID before trying again.');
+          } finally {
+            setPaymentBusy(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setPaymentStatus('Payment window closed. No payment was confirmed; you can try again or submit your application without paying.');
+            setPaymentBusy(false);
+          }
+        }
+      });
+      checkout.on('payment.failed', () => {
+        setPaymentStatus('Payment did not complete. You can try again or submit your application without paying.');
+        setPaymentBusy(false);
+      });
+      checkout.open();
     } catch (error) {
-      let errorMessage = form.querySelector('.form-error');
-      if (!errorMessage) {
-        errorMessage = document.createElement('p');
-        errorMessage.className = 'form-error';
-        errorMessage.setAttribute('role', 'alert');
-        form.querySelector('.form-submit').append(errorMessage);
-      }
-      errorMessage.textContent = 'Sorry, your enquiry could not be sent. Please check your connection and try again.';
-      submitButton.disabled = false;
-      submitButton.innerHTML = originalButtonContent;
+      setPaymentStatus('Razorpay could not start the payment. Check the payment setup and try again.');
+      setPaymentBusy(false);
     }
   });
-});
+}
+
+
 
 const quickPitchForm = document.getElementById('panic-quick-pitch');
 if (quickPitchForm) {
@@ -502,7 +690,7 @@ window.addEventListener('pagehide', () => window.clearInterval(pageTransitionTim
 document.addEventListener('click', (event) => {
   if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || pageTransitionInProgress) return;
   const link = event.target.closest('a[href]');
-  if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+  if (!link || (link.target && link.target !== '_self') || link.hasAttribute('download')) return;
 
   const destination = new URL(link.href, window.location.href);
   if (destination.origin !== window.location.origin) return;
@@ -528,7 +716,7 @@ document.addEventListener('click', (event) => {
   pageTransitionTimer = window.setInterval(() => {
     const now = performance.now();
     const cycleElapsed = now - cycleStarted;
-    const progress = Math.min(100, Math.round(cycleElapsed / 1300 * 100));
+    const progress = Math.min(100, Math.round(cycleElapsed / 350 * 100));
     progressFill.style.width = `${progress}%`;
     progressLabel.textContent = `${progress}%`;
     progressBar.setAttribute('aria-valuenow', String(progress));
